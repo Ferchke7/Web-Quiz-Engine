@@ -1,0 +1,8 @@
+# Project exclude paths
+/.gradle/
+/Topics/Bean validation/Tasks/build/
+/Topics/Optional/The address book/out/
+/Topics/Optional/The address book/out/production/classes/
+/Web Quiz Engine/task/build/
+/Web Quiz Engine/task/out/
+/Web Quiz Engine/task/out/production/classes/

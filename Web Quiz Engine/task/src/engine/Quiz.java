@@ -1,22 +1,24 @@
 package engine;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
-
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 
 public class Quiz {
 
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
    private int id;
    @NotNull
    private String title;
@@ -24,40 +26,28 @@ public class Quiz {
    private String text;
    @NotNull
    @Size(min = 2)
-   private String[] options;
+   @ElementCollection
+   private List<String> options;
+   @ElementCollection
    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-   private int[] answer;
+   private List<Integer> answer;
 
-   @Autowired
-   public boolean getAnswer(int[] answer){
+
+   public boolean getAnswer(List<Integer> answer){
       boolean result = false;
-      if(Arrays.equals(null,this.answer)){
-         setAnswer(new int[0]);
+      if(!answer.isEmpty()) {
+         if(answer.size() == 1 && this.answer.size() == 1) {
+            result = this.answer.contains(answer.get(0));
+         }
+         else {
+            Collections.sort(this.answer);
+            Collections.sort(answer);
+            result = answer.equals(this.answer);
+         }
       }
-      if(answer.length == 0 && this.answer.length == 0) {
+      else if (CollectionUtils.isEmpty(answer) && CollectionUtils.isEmpty(this.answer)) {
          result = true;
       }
-
-      else if(this.answer.length == 1 && answer.length == 1) {
-         int r = answer[0];
-         for (int j : this.answer) {
-
-            if (r == j) {
-               result = true;
-               break;
-            }
-
-         }
-      }
-      else if(answer.length >= 2) {
-         Arrays.sort(answer);
-         Arrays.sort(this.answer);
-         if(Arrays.equals(answer,this.answer)) {
-            result = true;
-         }
-
-      }
-
       return result;
    }
 }
